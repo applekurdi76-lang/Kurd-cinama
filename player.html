@@ -2,52 +2,32 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>پەخشکردن | KURD CINEMA</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>پەخشکردن</title>
     <style>
-        body { background: #000; color: white; font-family: sans-serif; margin: 0; text-align: center; }
-        .ep-card { background: #111; margin: 20px auto; max-width: 800px; padding: 20px; border-radius: 12px; border: 1px solid #333; }
-        video { width: 100%; border-radius: 8px; }
-        .back { color: #e50914; text-decoration: none; display: inline-block; margin: 20px; font-weight: bold; }
+        body { background: #000; color: white; text-align: center; font-family: sans-serif; }
+        video { width: 90%; max-width: 800px; margin-top: 50px; border: 2px solid #333; }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back">← گەڕانەوە بۆ لاپەڕەی سەرەکی</a>
-    <div id="episodes-container">باردەکرێت...</div>
+    <a href="index.html" style="color:#e50914; display:block; margin:20px;">گەڕانەوە</a>
+    <h2 id="title">خەلەکی دیاریکراو</h2>
+    <video id="vPlayer" controls></video>
 
     <script>
-        const S_URL = "https://lmizgmumuyflihplzkda.supabase.co";
-        const S_KEY = "sb_publishable_k5vAoL2L0OkjhmGOpCB9wA_5GOaLRct";
-        const supabase = supabase.createClient(S_URL, S_KEY);
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
 
-        async function loadEpisodes() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const movieId = urlParams.get('id');
+        // --- لێرە لینکی ڤیدیۆکان دیاری بکە بەپێی ئایدی ---
+        const links = {
+            "1": "https://www.w3schools.com/html/mov_bbb.mp4",
+            "2": "https://www.w3schools.com/html/movie.mp4"
+        };
 
-            const { data: eps, error } = await supabase
-                .from('episodes')
-                .select('*')
-                .eq('movie_id', movieId)
-                .order('ep_number', { ascending: true });
-
-            const container = document.getElementById('episodes-container');
-            container.innerHTML = "";
-
-            if (eps && eps.length > 0) {
-                eps.forEach(ep => {
-                    container.innerHTML += `
-                        <div class="ep-card">
-                            <h3>خەلەکا ${ep.ep_number}</h3>
-                            <video controls poster="https://via.placeholder.com/800x450/000/ff0000?text=KURD+CINEMA">
-                                <source src="${ep.video_url}" type="video/mp4">
-                            </video>
-                        </div>`;
-                });
-            } else {
-                container.innerHTML = "هیچ خەلەکەیەک بۆ ئەم فیلمە نییە.";
-            }
+        if (links[id]) {
+            document.getElementById('vPlayer').src = links[id];
+        } else {
+            document.body.innerHTML = "ڤیدیۆکە نەدۆزرایەوە!";
         }
-        loadEpisodes();
     </script>
 </body>
 </html>
