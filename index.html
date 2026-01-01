@@ -2,53 +2,79 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>KURD CINEMA</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ماموستا ابراهیم - سەرەکی</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #000; color: white; font-family: sans-serif; text-align: center; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px; }
-        .card { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #222; }
-        .card img { width: 100%; border-radius: 5px; height: 250px; object-fit: cover; }
-        .btn { display: block; background: #e50914; color: white; text-decoration: none; padding: 8px; margin-top: 10px; border-radius: 5px; }
+        /* ستایلی خۆت لێرە کورتکراوەتەوە */
+        * { box-sizing: border-box; }
+        body { background-color: #000; color: #fff; font-family: sans-serif; margin: 0; display: none; }
+        header { padding: 40px 20px; text-align: center; background: linear-gradient(#1a0000, #000); }
+        h1 { color: #e50914; font-size: 2.5rem; }
+        .controls-section { position: sticky; top: 0; background: rgba(0,0,0,0.9); padding: 15px; border-bottom: 1px solid #222; }
+        #movieSearch { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #333; background: #111; color: #fff; }
+        .main-wrapper { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+        .product-card { background: #141414; border-radius: 10px; border: 1px solid #222; overflow: hidden; text-align: center; }
+        .product-card img { width: 100%; height: 280px; object-fit: cover; }
+        .btn-link { display: inline-block; padding: 8px 15px; background: #e50914; color: #fff; text-decoration: none; border-radius: 4px; margin: 10px 0; }
+        .logout-btn { position: fixed; top: 10px; left: 10px; background: #e50914; border: none; color: white; padding: 8px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <header style="padding: 20px; border-bottom: 2px solid #e50914;">
-        <h1>کورد سینەما</h1>
-        <button onclick="logout()" style="background:none; border:1px solid #555; color:#ccc; cursor:pointer;">دەرچوون</button>
+
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+
+    <header>
+        <h1>ماموستا ابراهیم خلیل</h1>
+        <p>بابه ته کانی کومپیوته ر IT</p>
     </header>
 
-    <div class="grid" id="movieList"></div>
+    <div class="controls-section">
+        <input type="text" id="movieSearch" placeholder="بگەڕێ بۆ بابەتەکان..." onkeyup="filterMovies()">
+    </div>
 
-    <script>
-        const supabase = supabase.createClient('https://lmizgmumuyflihplzkda.supabase.co', 'sb_publishable_k5vAoL2L0OkjhmGOpCB9wA_5GOaLRct');
+    <div class="main-wrapper" id="movieList">
+        <div class="product-card">
+            <img src="ashraf.jpeg">
+            <div style="padding:10px;">
+                <h3>ئەشرەف و ڕویا</h3>
+                <a href="ashraf.html" class="btn-link">تەماشا بکە</a>
+            </div>
+        </div>
+    </div>
 
-        // --- لێرە فیلمەکانت زیاد بکە ---
-        const movies = [
-            { id: "1", title: "فیلمی یەکەم", img: "https://via.placeholder.com/200x300" },
-            { id: "2", title: "فیلمی دووەم", img: "https://via.placeholder.com/200x300" }
-        ];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        async function check() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) window.location.href = "login.html";
-            else showMovies();
-        }
+        const firebaseConfig = {
+            apiKey: "AIzaSyATrfYzS1tRQQYuG0xQhsQVkOwuT9L_oGM",
+            authDomain: "kurdcenama-f9682.firebaseapp.com",
+            projectId: "kurdcenama-f9682",
+            storageBucket: "kurdcenama-f9682.firebasestorage.app",
+            messagingSenderId: "792140634516",
+            appId: "1:792140634516:web:defe9a2d719af231cfd781"
+        };
 
-        function showMovies() {
-            const list = document.getElementById('movieList');
-            movies.forEach(m => {
-                list.innerHTML += `
-                    <div class="card">
-                        <img src="${m.img}">
-                        <h3>${m.title}</h3>
-                        <a href="player.html?id=${m.id}" class="btn">تەماشا بکە</a>
-                    </div>`;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) { document.body.style.display = "block"; }
+            else { window.location.href = "login.html"; }
+        });
+
+        document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+        window.filterMovies = function() {
+            let input = document.getElementById('movieSearch').value.toLowerCase();
+            let cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                let title = card.querySelector('h3').innerText.toLowerCase();
+                card.style.display = title.includes(input) ? "block" : "none";
             });
         }
-
-        async function logout() { await supabase.auth.signOut(); window.location.href="login.html"; }
-        check();
     </script>
 </body>
 </html>

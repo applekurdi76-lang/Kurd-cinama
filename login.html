@@ -2,42 +2,69 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>چوونەژوورەوە | KURD CINEMA</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Mamosta Ibrahim</title>
+    <link rel="manifest" href="manifest.json">
     <style>
-        body { background: #000; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #111; padding: 30px; border-radius: 10px; border: 1px solid #e50914; width: 300px; text-align: center; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-        button { width: 100%; padding: 10px; background: #e50914; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body {
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1509228468518-180dd482180c?q=80&w=1600');
+            background-size: cover; height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+        .login-card {
+            background: rgba(0, 0, 0, 0.9); padding: 40px; border-radius: 12px;
+            width: 90%; max-width: 380px; border-top: 5px solid #e50914; text-align: center;
+        }
+        h2 { color: #fff; margin-bottom: 25px; font-size: 1.8rem; }
+        input {
+            width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 5px;
+            border: none; background: #333; color: white; outline: none; font-size: 16px;
+        }
+        button {
+            width: 100%; padding: 15px; border-radius: 5px; border: none;
+            background: #e50914; color: white; font-weight: bold; cursor: pointer; font-size: 18px;
+        }
+        #error-msg { color: #e50914; margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div class="box">
+    <div class="login-card">
         <h2>چوونەژوورەوە</h2>
         <input type="email" id="email" placeholder="ئیمەیڵ">
         <input type="password" id="password" placeholder="وشەی نهێنی">
-        <button onclick="handleAuth('in')">چوونەژوورەوە</button>
-        <button onclick="handleAuth('up')" style="background:#333; margin-top:10px;">دروستکردنی ئەکاونت</button>
-        <p id="msg" style="font-size: 12px; color: yellow;"></p>
+        <button id="loginBtn">Login</button>
+        <p id="error-msg"></p>
     </div>
 
-    <script>
-        const supabase = supabase.createClient('https://lmizgmumuyflihplzkda.supabase.co', 'sb_publishable_k5vAoL2L0OkjhmGOpCB9wA_5GOaLRct');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        async function handleAuth(type) {
+        const firebaseConfig = {
+            apiKey: "AIzaSyATrfYzS1tRQQYuG0xQhsQVkOwuT9L_oGM",
+            authDomain: "kurdcenama-f9682.firebaseapp.com",
+            projectId: "kurdcenama-f9682",
+            storageBucket: "kurdcenama-f9682.firebasestorage.app",
+            messagingSenderId: "792140634516",
+            appId: "1:792140634516:web:defe9a2d719af231cfd781"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.getElementById('loginBtn').onclick = async () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const msg = document.getElementById('msg');
-            
-            if (type === 'in') {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) msg.innerText = error.message;
-                else window.location.href = "index.html";
-            } else {
-                const { error } = await supabase.auth.signUp({ email, password });
-                if (error) msg.innerText = error.message;
-                else msg.innerText = "ئیمەیڵەکەت پشتڕاست بکەرەوە پاشان وەرەژوورەوە.";
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.location.href = "index.html";
+            } catch (e) {
+                document.getElementById('error-msg').innerText = "زانیارییەکان هەڵەن!";
             }
+        };
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
         }
     </script>
 </body>
